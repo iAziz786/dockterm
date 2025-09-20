@@ -20,22 +20,22 @@ git clone https://github.com/iAziz786/dotfiles.git
 # Checkout specific commit
 cd ~/dotfiles
 echo "Checking out commit df7780fd8f16f88b7399357dfcabaec802665dc1..."
-git checkout df7780fd8f16f88b7399357dfcabaec802665dc1
+git checkout 74935394cdffae90d5790bdea9c5a7da35c5c6f3
 
 # Use GNU Stow to symlink the configurations
 cd ~/dotfiles
 
 # List of packages to stow (excluding desktop apps)
 PACKAGES=(
-    "atuin"
-    "bat"
-    "claude"
-    "eza"
-    "nushell"
-    "nvim"
-    "starship"
-    "zellij"
-    "zsh"
+  "atuin"
+  "bat"
+  "claude"
+  "eza"
+  "nushell"
+  "nvim"
+  "starship"
+  "zellij"
+  "zsh"
 )
 
 echo "Creating symlinks with GNU Stow..."
@@ -43,17 +43,17 @@ echo "Creating symlinks with GNU Stow..."
 # Remove existing .zshrc if it's a regular file (not a symlink)
 # This handles the oh-my-zsh default .zshrc
 if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
-    echo "Removing existing .zshrc (will be replaced by dotfiles version)"
-    rm "$HOME/.zshrc"
+  echo "Removing existing .zshrc (will be replaced by dotfiles version)"
+  rm "$HOME/.zshrc"
 fi
 
 for package in "${PACKAGES[@]}"; do
-    if [ -d "$package" ]; then
-        echo "Stowing $package..."
-        stow -v --target="$HOME" "$package" 2>&1 || echo "Warning: Failed to stow $package"
-    else
-        echo "Warning: $package directory not found"
-    fi
+  if [ -d "$package" ]; then
+    echo "Stowing $package..."
+    stow -v --target="$HOME" "$package" 2>&1 || echo "Warning: Failed to stow $package"
+  else
+    echo "Warning: $package directory not found"
+  fi
 done
 
 # Set zsh as default shell (requires sudo)
@@ -61,3 +61,4 @@ echo "Setting zsh as default shell..."
 sudo chsh -s $(which zsh) developer
 
 echo "Dotfiles setup complete in Docker container!"
+

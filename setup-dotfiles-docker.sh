@@ -15,15 +15,17 @@ mkdir -p ~/.config
 
 # Clone the dotfiles repository using HTTPS (no SSH keys during build)
 echo "Cloning dotfiles repository..."
-git clone https://github.com/iAziz786/dotfiles.git
+git clone https://github.com/iAziz786/dotfiles.git ~/dotfiles
 
 # Checkout specific commit
 cd ~/dotfiles
-echo "Checking out commit df7780fd8f16f88b7399357dfcabaec802665dc1..."
-git checkout 8770529263f7986b64407eb4bf20ef3a15387bd1
-
-# Use GNU Stow to symlink the configurations
-cd ~/dotfiles
+echo "Checking out commit 8770529263f7986b64407eb4bf20ef3a15387bd1..."
+if ! git checkout 8770529263f7986b64407eb4bf20ef3a15387bd1; then
+    echo "Error: Failed to checkout specific commit"
+    echo "Available commits:"
+    git log --oneline | head -5
+    exit 1
+fi
 
 # List of packages to stow (excluding desktop apps)
 PACKAGES=(

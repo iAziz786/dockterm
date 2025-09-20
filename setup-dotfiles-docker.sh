@@ -20,7 +20,7 @@ git clone https://github.com/iAziz786/dotfiles.git
 # Checkout specific commit
 cd ~/dotfiles
 echo "Checking out commit df7780fd8f16f88b7399357dfcabaec802665dc1..."
-git checkout 74935394cdffae90d5790bdea9c5a7da35c5c6f3
+git checkout 8770529263f7986b64407eb4bf20ef3a15387bd1
 
 # Use GNU Stow to symlink the configurations
 cd ~/dotfiles

@@ -1,0 +1,16 @@
+services:
+  dev-env:
+    build:
+      context: .
+      platforms:
+        - linux/amd64
+    image: dockterm
+    network_mode: host
+    volumes:
+      - ~/.ssh:/home/developer/.ssh:ro
+      - ~/workspace:/workspace
+      - dev-home:/home/developer
+    restart: unless-stopped
+
+volumes:
+  dev-home:

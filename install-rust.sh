@@ -3,14 +3,14 @@ set -e
 
 # Install Rust using rustup
 echo "Installing Rust..."
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
 
-# Source cargo environment for current session
-source "$HOME/.cargo/env"
+# Add cargo bin to PATH for verification
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # Verify installation
 echo "Verifying Rust installation..."
-rustc --version
-cargo --version
+$HOME/.cargo/bin/rustc --version
+$HOME/.cargo/bin/cargo --version
 
 echo "Rust installation completed successfully!"

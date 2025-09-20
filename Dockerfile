@@ -94,14 +94,14 @@ RUN mkdir -p /home/developer/.config
 # Install oh-my-zsh FIRST (before dotfiles, since .zshrc expects it)
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-# Install modern CLI tools (before dotfiles, since .zshrc references them)
-RUN /tmp/install-tools.sh && rm /tmp/install-tools.sh
+# Install Rust FIRST (before other tools that use .cargo/bin)
+RUN /tmp/install-rust.sh && rm /tmp/install-rust.sh
 
 # Install Go from official binary
 RUN /tmp/install-go.sh && rm /tmp/install-go.sh
 
-# Install Rust using rustup
-RUN /tmp/install-rust.sh && rm /tmp/install-rust.sh
+# Install modern CLI tools (after Rust, so .cargo/bin exists properly)
+RUN /tmp/install-tools.sh && rm /tmp/install-tools.sh
 
 # Set up PATH for cargo and atuin binaries
 ENV PATH="/home/developer/.cargo/bin:/home/developer/.atuin/bin:${PATH}"

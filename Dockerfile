@@ -70,10 +70,10 @@ RUN useradd -m -s /bin/zsh -G sudo developer
 RUN echo 'developer:devpassword' | chpasswd
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# Create SSH directory for developer user
-RUN mkdir -p /home/developer/.ssh
+# Create SSH directory and Code directory for developer user
+RUN mkdir -p /home/developer/.ssh /home/developer/Code
 RUN chmod 700 /home/developer/.ssh
-RUN chown developer:developer /home/developer/.ssh
+RUN chown -R developer:developer /home/developer/.ssh /home/developer/Code
 
 
 # Switch to developer user for user-specific installations

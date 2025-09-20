@@ -71,9 +71,6 @@ RUN mkdir -p /home/developer/.ssh
 RUN chmod 700 /home/developer/.ssh
 RUN chown developer:developer /home/developer/.ssh
 
-# Create workspace directory
-RUN mkdir -p /workspace
-RUN chown developer:developer /workspace
 
 # Expose SSH port
 EXPOSE 22

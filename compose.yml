@@ -4,11 +4,16 @@ services:
       context: .
       platforms:
         - linux/amd64
+        - linux/arm64
+        - darwin/arm64
     image: dockterm
-    network_mode: host
+    # Remove network_mode host since not supported on macOS
+    # network_mode: host
+    ports:
+      - "2222:22"    # Map container SSH port 22 to host port 2222
+      # Add additional ports here as needed for your apps
     volumes:
-      - ~/.ssh:/home/developer/.ssh:ro
-      - ~/workspace:/workspace
+      - ./.docker-keys:/home/developer/.ssh:rw
       - dev-home:/home/developer
     restart: unless-stopped
 

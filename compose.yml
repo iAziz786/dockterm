@@ -1,17 +1,16 @@
 services:
-  dev-env:
-    build:
-      context: .
-    image: dockterm
-    # Remove network_mode host since not supported on macOS
-    # network_mode: host
+  dockterm:
+    image: ghcr.io/iaziz786/dockterm@sha256:b01b6864bbf3be5a4d35dd4d7354d00c8e4447efc72e7b62be9863ac6e5428f5
+    platform: linux/amd64
     ports:
-      - "2222:22"    # Map container SSH port 22 to host port 2222
-      # Add additional ports here as needed for your apps
+      - "2222:22"
+      # general port for the development, add your own
+      - "3000:3000"
+      - "8080:8080"
     volumes:
       - ./.docker-keys:/home/developer/.ssh:rw
-      - dev-home:/home/developer
+      - dockterm-home:/home/developer
     restart: unless-stopped
 
 volumes:
-  dev-home:
+  dockterm-home:

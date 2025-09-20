@@ -48,8 +48,7 @@ RUN apt-get install -y \
   fd-find \
   ripgrep \
   fzf \
-  zoxide \
-  golang-go
+  zoxide
 
 # Unminimize Ubuntu to get the full server experience
 RUN yes | unminimize
@@ -85,7 +84,9 @@ WORKDIR /home/developer
 # Copy install scripts
 COPY --chown=developer:developer install-tools.sh /tmp/install-tools.sh
 COPY --chown=developer:developer setup-dotfiles-docker.sh /tmp/setup-dotfiles-docker.sh
-RUN chmod +x /tmp/install-tools.sh /tmp/setup-dotfiles-docker.sh
+COPY --chown=developer:developer install-go.sh /tmp/install-go.sh
+COPY --chown=developer:developer install-rust.sh /tmp/install-rust.sh
+RUN chmod +x /tmp/install-tools.sh /tmp/setup-dotfiles-docker.sh /tmp/install-go.sh /tmp/install-rust.sh
 
 # Create .config directory
 RUN mkdir -p /home/developer/.config
@@ -95,6 +96,12 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 
 # Install modern CLI tools (before dotfiles, since .zshrc references them)
 RUN /tmp/install-tools.sh && rm /tmp/install-tools.sh
+
+# Install Go from official binary
+RUN /tmp/install-go.sh && rm /tmp/install-go.sh
+
+# Install Rust using rustup
+RUN /tmp/install-rust.sh && rm /tmp/install-rust.sh
 
 # Set up PATH for cargo and atuin binaries
 ENV PATH="/home/developer/.cargo/bin:/home/developer/.atuin/bin:${PATH}"

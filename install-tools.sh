@@ -62,6 +62,14 @@ tar xzf nu-*.tar.gz
 cp nu-*/nu "$INSTALL_DIR/"
 echo "✓ nushell installed"
 
+# zoxide - Smart directory jumper
+echo "Installing zoxide..."
+wget -q "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.8/zoxide-0.9.8-x86_64-unknown-linux-musl.tar.gz"
+tar xzf zoxide-*.tar.gz
+chmod +x zoxide
+mv zoxide "$INSTALL_DIR/"
+echo "✓ zoxide installed"
+
 # atuin - Shell history manager
 echo "Installing atuin..."
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-installer.sh | sh
@@ -78,7 +86,7 @@ echo "Make sure $INSTALL_DIR is in your PATH"
 # Verify installations
 echo ""
 echo "Verifying installations:"
-for tool in bat eza starship zellij nu; do
+for tool in bat eza starship zellij nu zoxide; do
     if [ -f "$INSTALL_DIR/$tool" ]; then
         echo "✓ $tool found"
     else

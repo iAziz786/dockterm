@@ -47,8 +47,7 @@ RUN apt-get install -y \
   stow \
   fd-find \
   ripgrep \
-  fzf \
-  zoxide
+  fzf
 
 # Unminimize Ubuntu to get the full server experience
 RUN yes | unminimize

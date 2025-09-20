@@ -1,6 +1,6 @@
 services:
   dockterm:
-    image: ghcr.io/iaziz786/dockterm@sha256:b01b6864bbf3be5a4d35dd4d7354d00c8e4447efc72e7b62be9863ac6e5428f5
+    image: ghcr.io/iaziz786/dockterm@sha256:5bc2e7949e3c223d7d73003c85b4b64bf06c8a4aaa30ec92d6be9c84aeeb521a
     platform: linux/amd64
     ports:
       - "2222:22"
@@ -10,7 +10,9 @@ services:
     volumes:
       - ./.docker-keys:/home/developer/.ssh:rw
       - dockterm-home:/home/developer
+      - code:/home/developer/Code
     restart: unless-stopped
 
 volumes:
   dockterm-home:
+  code:

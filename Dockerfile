@@ -67,8 +67,8 @@ RUN sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 # Set root password (change this to something secure)
 RUN echo 'root:devpassword' | chpasswd
 
-# Create a non-root user for development
-RUN useradd -m -s /bin/bash -G sudo developer
+# Create a non-root user for development with zsh as default shell
+RUN useradd -m -s /bin/zsh -G sudo developer
 RUN echo 'developer:devpassword' | chpasswd
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
@@ -77,38 +77,48 @@ RUN mkdir -p /home/developer/.ssh
 RUN chmod 700 /home/developer/.ssh
 RUN chown developer:developer /home/developer/.ssh
 
+
 # Switch to developer user for user-specific installations
 USER developer
 WORKDIR /home/developer
 
-# Install Rust and cargo for developer user
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/home/developer/.cargo/bin:${PATH}"
+# Copy install scripts
+COPY --chown=developer:developer install-tools.sh /tmp/install-tools.sh
+COPY --chown=developer:developer setup-dotfiles-docker.sh /tmp/setup-dotfiles-docker.sh
+RUN chmod +x /tmp/install-tools.sh /tmp/setup-dotfiles-docker.sh
 
-# Install modern CLI tools via cargo
-RUN /home/developer/.cargo/bin/cargo install bat eza atuin starship zellij nu --locked
+# Create .config directory
+RUN mkdir -p /home/developer/.config
 
-# Install oh-my-zsh
+# Install oh-my-zsh FIRST (before dotfiles, since .zshrc expects it)
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
+# Install modern CLI tools (before dotfiles, since .zshrc references them)
+RUN /tmp/install-tools.sh && rm /tmp/install-tools.sh
+
+# Set up PATH for cargo and atuin binaries
+ENV PATH="/home/developer/.cargo/bin:/home/developer/.atuin/bin:${PATH}"
+
+# Set up dotfiles LAST (after oh-my-zsh and tools are installed)
+RUN /tmp/setup-dotfiles-docker.sh && rm /tmp/setup-dotfiles-docker.sh
+
 # Install NeoVim (using latest stable release)
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz \
-  sudo rm -rf /opt/nvim-linux-x86_64 \
-  sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
+RUN curl -LO https://github.com/neovim/neovim-releases/releases/download/v0.11.4/nvim-linux-x86_64.tar.gz && \
+  tar -xzf nvim-linux-x86_64.tar.gz && \
+  sudo mv nvim-linux-x86_64 /opt/nvim && \
+  rm nvim-linux-x86_64.tar.gz && \
+  sudo ln -s /opt/nvim/bin/nvim /usr/local/bin/nvim
 
 # Install uv (Python package manager)
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/home/developer/.local/bin:${PATH}"
 
 # Install mise (runtime version manager)
 RUN curl https://mise.run | sh
 
 # Install bun
 RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/home/developer/.bun/bin:${PATH}"
 
-# Create .config directory
-RUN mkdir -p /home/developer/.config
+
 
 # Switch back to root for sshd
 USER root

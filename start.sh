@@ -3,12 +3,17 @@
 # Default values
 COPY_SSH=true
 SSH_DIR="$HOME/.ssh"
+SETUP_DOTFILES=true
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         --no-ssh)
             COPY_SSH=false
+            shift
+            ;;
+        --no-dotfiles)
+            SETUP_DOTFILES=false
             shift
             ;;
         --ssh-dir)
@@ -21,6 +26,7 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --ssh-dir <path>  Specify SSH directory (default: ~/.ssh)"
             echo "  --no-ssh          Skip copying SSH keys"
+            echo "  --no-dotfiles     Skip dotfiles setup (default: setup dotfiles)"
             echo "  -h, --help        Show this help message"
             exit 0
             ;;
@@ -107,6 +113,17 @@ for i in {1..10}; do
     echo "Waiting for SSH service... ($i/10)"
     sleep 1
 done
+
+# Set up dotfiles if requested
+if [ "$SETUP_DOTFILES" = true ]; then
+    echo "Copying dotfiles setup script to container..."
+    docker cp setup-dotfiles.sh dockterm-dev-env-1:/home/developer/setup-dotfiles.sh
+    docker exec dockterm-dev-env-1 chown developer:developer /home/developer/setup-dotfiles.sh
+    docker exec dockterm-dev-env-1 chmod +x /home/developer/setup-dotfiles.sh
+
+    echo "Running dotfiles setup..."
+    docker exec -u developer dockterm-dev-env-1 /home/developer/setup-dotfiles.sh
+fi
 
 # SSH into the container
 echo "Connecting to the container..."

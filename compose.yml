@@ -2,10 +2,6 @@ services:
   dev-env:
     build:
       context: .
-      platforms:
-        - linux/amd64
-        - linux/arm64
-        - darwin/arm64
     image: dockterm
     # Remove network_mode host since not supported on macOS
     # network_mode: host

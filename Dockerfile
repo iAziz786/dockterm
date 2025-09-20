@@ -43,7 +43,13 @@ RUN apt-get install -y \
   telnet \
   nmap \
   strace \
-  ltrace
+  ltrace \
+  stow \
+  fd-find \
+  ripgrep \
+  fzf \
+  zoxide \
+  golang-go
 
 # Unminimize Ubuntu to get the full server experience
 RUN yes | unminimize
@@ -71,6 +77,43 @@ RUN mkdir -p /home/developer/.ssh
 RUN chmod 700 /home/developer/.ssh
 RUN chown developer:developer /home/developer/.ssh
 
+# Switch to developer user for user-specific installations
+USER developer
+WORKDIR /home/developer
+
+# Install Rust and cargo for developer user
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/home/developer/.cargo/bin:${PATH}"
+
+# Install modern CLI tools via cargo
+RUN /home/developer/.cargo/bin/cargo install bat eza atuin starship zellij nu --locked
+
+# Install oh-my-zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+# Install NeoVim (using latest stable release)
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
+  tar -xzf nvim-linux64.tar.gz && \
+  sudo mv nvim-linux64 /opt/nvim && \
+  rm nvim-linux64.tar.gz
+ENV PATH="/opt/nvim/bin:${PATH}"
+
+# Install uv (Python package manager)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/home/developer/.local/bin:${PATH}"
+
+# Install mise (runtime version manager)
+RUN curl https://mise.run | sh
+
+# Install bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/home/developer/.bun/bin:${PATH}"
+
+# Create .config directory
+RUN mkdir -p /home/developer/.config
+
+# Switch back to root for sshd
+USER root
 
 # Expose SSH port
 EXPOSE 22

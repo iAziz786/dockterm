@@ -7,7 +7,6 @@ A Docker-based development environment with SSH access, providing a consistent U
 - Ubuntu 24.04 base image with development tools pre-installed
 - SSH server for remote access
 - Persistent home directory
-- Support for multiple architectures (linux/amd64, linux/arm64, darwin/arm64)
 - Automatic SSH key management
 - Git-ready environment with private repository support
 
@@ -19,18 +18,22 @@ A Docker-based development environment with SSH access, providing a consistent U
 ## Quick Start
 
 1. Clone this repository:
+
 ```bash
 git clone https://github.com/iAziz786/dockterm.git
 cd dockterm
 ```
 
 2. Start and connect to the container:
+
 ```bash
 ./start.sh
 ```
+
 This will start the container and automatically SSH into it.
 
 To connect manually later:
+
 ```bash
 ssh -p 2222 developer@localhost
 ```
@@ -40,6 +43,7 @@ Default password: `devpassword` (only used if SSH keys are not set up)
 ## SSH Key Setup
 
 The `start.sh` script automatically copies your SSH keys from `~/.ssh/` to the container, allowing:
+
 - Passwordless SSH access to the container
 - Git operations with private repositories
 
@@ -57,6 +61,7 @@ Host dockterm
 ```
 
 Then you can simply connect using:
+
 ```bash
 ssh dockterm
 ```
@@ -90,6 +95,7 @@ The `start.sh` script supports several options:
 The container includes your SSH keys, allowing you to:
 
 1. Clone private repositories:
+
 ```bash
 ssh dockterm
 cd /tmp
@@ -97,6 +103,7 @@ git clone git@github.com:your-username/private-repo.git
 ```
 
 2. Configure Git (first time):
+
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
@@ -132,6 +139,7 @@ The following volumes are mounted:
 ## Installed Software
 
 The container includes:
+
 - Development tools: git, vim, nano, tmux, screen
 - Languages: Python 3, Node.js, npm, Java (OpenJDK)
 - Database clients: PostgreSQL, MySQL, SQLite, Redis
@@ -141,19 +149,39 @@ The container includes:
 ## Troubleshooting
 
 ### SSH Connection Refused
+
 - Ensure the container is running: `docker compose ps`
 - Check if port 2222 is available: `lsof -i :2222`
 
 ### Permission Denied (SSH)
+
 - Run `./start.sh` to copy your SSH keys
 - Ensure your public key exists: `ls ~/.ssh/*.pub`
 
 ### Git Clone Fails
+
 - The container needs your private keys for authentication
 - Ensure SSH agent forwarding or key copying is working
 - You may need to add GitHub/GitLab to known_hosts first:
+
   ```bash
   ssh-keyscan github.com >> ~/.ssh/known_hosts
+  ```
+
+### Multi-platform Build Error
+
+If you get "multiple platforms feature is not supported for docker driver":
+
+- Enable Docker Buildx (one-time setup):
+
+  ```bash
+  docker buildx create --use --name multiarch
+  ```
+
+- Alternatively, build for current platform only:
+
+  ```bash
+  docker build -t dockterm .
   ```
 
 ## Security Notes
@@ -165,3 +193,4 @@ The container includes:
 ## License
 
 MIT
+

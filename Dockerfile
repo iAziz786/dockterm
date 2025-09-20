@@ -49,8 +49,7 @@ RUN apt-get install -y \
   ripgrep \
   fzf \
   zoxide \
-  golang-go \
-  nvim
+  golang-go
 
 # Unminimize Ubuntu to get the full server experience
 RUN yes | unminimize
@@ -91,6 +90,11 @@ RUN /home/developer/.cargo/bin/cargo install bat eza atuin starship zellij nu --
 
 # Install oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+# Install NeoVim (using latest stable release)
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz \
+  sudo rm -rf /opt/nvim-linux-x86_64 \
+  sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 
 # Install uv (Python package manager)
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh

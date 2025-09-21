@@ -28,70 +28,69 @@ echo -e "${YELLOW}Running as: $CURRENT_USER${NC}"
 
 # Function to check if migration has run
 has_run() {
-    grep -q "^$1$" "$MIGRATION_STATE_FILE" 2>/dev/null
+  grep -q "^$1$" "$MIGRATION_STATE_FILE" 2>/dev/null
 }
 
 # Function to mark migration as complete
 mark_complete() {
-    echo "$1" >> "$MIGRATION_STATE_FILE"
+  echo "$1" >>"$MIGRATION_STATE_FILE"
 }
 
 # Function to run a single migration
 run_migration() {
-    local script="$1"
-    local script_name=$(basename "$script")
+  local script="$1"
+  local script_name=$(basename "$script")
 
-    # Check if already run
-    if has_run "$script_name"; then
-        echo -e "${YELLOW}  ⊙ Skipping (already run): $script_name${NC}"
-        return 0
-    fi
+  # Check if already run
+  if has_run "$script_name"; then
+    echo -e "${YELLOW}  ⊙ Skipping (already run): $script_name${NC}"
+    return 0
+  fi
 
-    echo -e "${BLUE}  → Running: $script_name${NC}"
+  echo -e "${BLUE}  → Running: $script_name${NC}"
 
-    # Make executable and run
-    chmod +x "$script"
-    if "$script"; then
-        mark_complete "$script_name"
-        echo -e "${GREEN}  ✓ Completed: $script_name${NC}"
-    else
-        echo -e "${RED}  ✗ Failed: $script_name${NC}"
-        exit 1
-    fi
+  if "$script"; then
+    mark_complete "$script_name"
+    echo -e "${GREEN}  ✓ Completed: $script_name${NC}"
+  else
+    echo -e "${RED}  ✗ Failed: $script_name${NC}"
+    exit 1
+  fi
 }
 
 # Process system migrations (only as root)
 if [ "$CURRENT_USER" = "root" ]; then
-    echo -e "\n${BLUE}[System Migrations]${NC}"
+  echo -e "\n${BLUE}[System Migrations]${NC}"
 
-    if [ -d "$SCRIPT_DIR/system" ]; then
-        # Sort scripts by timestamp (filename already contains it)
-        for script in $(ls "$SCRIPT_DIR/system"/*.sh 2>/dev/null | sort); do
-            run_migration "$script"
-        done
-    else
-        echo -e "${YELLOW}  No system migrations found${NC}"
-    fi
+  if [ -d "$SCRIPT_DIR/system" ]; then
+    # Sort scripts by timestamp (filename already contains it)
+    for script in $(ls "$SCRIPT_DIR/system"/*.sh 2>/dev/null | sort); do
+      run_migration "$script"
+    done
+  else
+    echo -e "${YELLOW}  No system migrations found${NC}"
+  fi
 else
-    echo -e "\n${YELLOW}[System Migrations] - Skipping (requires root)${NC}"
+  echo -e "\n${YELLOW}[System Migrations] - Skipping (requires root)${NC}"
 fi
 
 # Process user migrations (only as developer)
 if [ "$CURRENT_USER" = "developer" ]; then
-    echo -e "\n${BLUE}[User Migrations]${NC}"
+  echo -e "\n${BLUE}[User Migrations]${NC}"
 
-    if [ -d "$SCRIPT_DIR/user" ]; then
-        # Sort scripts by timestamp (filename already contains it)
-        for script in $(ls "$SCRIPT_DIR/user"/*.sh 2>/dev/null | sort); do
-            run_migration "$script"
-        done
-    else
-        echo -e "${YELLOW}  No user migrations found${NC}"
-    fi
+  if [ -d "$SCRIPT_DIR/user" ]; then
+    # Sort scripts by timestamp (filename already contains it)
+    for script in $(ls "$SCRIPT_DIR/user"/*.sh 2>/dev/null | sort); do
+      run_migration "$script"
+    done
+  else
+    echo -e "${YELLOW}  No user migrations found${NC}"
+  fi
 else
-    echo -e "\n${YELLOW}[User Migrations] - Skipping (requires developer user)${NC}"
+  echo -e "\n${YELLOW}[User Migrations] - Skipping (requires developer user)${NC}"
 fi
 
 echo -e "\n${GREEN}=========================================="
 echo "       All migrations completed!"
 echo -e "==========================================${NC}"
+

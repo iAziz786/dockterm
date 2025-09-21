@@ -1,196 +1,63 @@
 # DockTerm
 
-A Docker-based development environment with SSH access, providing a consistent Ubuntu 24 workspace across different platforms.
-
-## Features
-
-- Ubuntu 24.04 base image with development tools pre-installed
-- SSH server for remote access
-- Persistent home directory
-- Automatic SSH key management
-- Git-ready environment with private repository support
-
-## Prerequisites
-
-- Docker and Docker Compose installed
-- SSH keys configured in `~/.ssh/` (optional)
+Ubuntu 24.04 development container with modern tools pre-installed.
 
 ## Quick Start
-
-1. Clone this repository:
 
 ```bash
 git clone https://github.com/iAziz786/dockterm.git
 cd dockterm
+make flow
 ```
 
-2. Start and connect to the container:
+That's it! You're now inside a fully configured development environment.
+
+## Commands
 
 ```bash
-./start.sh
+make flow    # Start and connect (use this most of the time)
+make stop    # Stop container
+make exec    # Connect without SSH (faster)
+make help    # Show all commands
 ```
 
-This will start the container and automatically SSH into it.
+## Adding Tools
 
-To connect manually later:
+Need a new tool? Create a migration:
+
+```bash
+make migrate TYPE=user NAME=install_something
+```
+
+Edit the generated file in `migrations/user/`, then rebuild:
+
+```bash
+make build
+make flow
+```
+
+## What's Included
+
+**Languages:** Go 1.25.1, Rust, Python 3, Node.js, Java
+**Package Managers:** cargo, npm, pip, uv, bun, mise
+**CLI Tools:** bat, eza, ripgrep, fzf, fd, zoxide, atuin
+**Editors:** Neovim 0.11.4, vim, nano
+**Shells:** zsh with oh-my-zsh, bash
+**Database Clients:** PostgreSQL, MySQL, SQLite, Redis
+**Others:** tmux, git, docker, terraform, kubectl, aws-cli
+
+## SSH Access
 
 ```bash
 ssh -p 2222 developer@localhost
-```
-
-Default password: `devpassword` (only used if SSH keys are not set up)
-
-## SSH Key Setup
-
-The `start.sh` script automatically copies your SSH keys from `~/.ssh/` to the container, allowing:
-
-- Passwordless SSH access to the container
-- Git operations with private repositories
-
-### Passwordless SSH Login
-
-To enable passwordless SSH login to the container, add this to your `~/.ssh/config`:
-
-```
-Host dockterm
-    HostName localhost
-    Port 2222
-    User developer
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-```
-
-Then you can simply connect using:
-
-```bash
-ssh dockterm
-```
-
-## Script Options
-
-The `start.sh` script supports several options:
-
-```bash
-# Default: Copy SSH keys from ~/.ssh
-./start.sh
-
-# Use custom SSH directory
-./start.sh --ssh-dir /path/to/ssh
-
-# Skip SSH key copying entirely
-./start.sh --no-ssh
-
-# Show help
-./start.sh --help
-```
-
-## Directory Structure
-
-- `.docker-keys/` - Temporary directory for SSH keys (git-ignored)
-  - `authorized_keys` - Combined public keys for SSH access
-  - Individual SSH key files copied from your system
-
-## Working with Git
-
-The container includes your SSH keys, allowing you to:
-
-1. Clone private repositories:
-
-```bash
-ssh dockterm
-cd /tmp
-git clone git@github.com:your-username/private-repo.git
-```
-
-2. Configure Git (first time):
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-```
-
-## Managing the Container
-
-```bash
-# Start the container
-./start.sh
-
-# Stop and clean up all resources
-./stop.sh
-
-# View container logs
-docker compose logs -f
-
-# Execute commands directly
-docker exec dockterm-dev-env-1 <command>
-
-# Restart with fresh SSH keys
-./stop.sh
-./start.sh
+# Password: devpassword
 ```
 
 ## Volumes
 
-The following volumes are mounted:
-
-- `.docker-keys:/home/developer/.ssh` - SSH configuration and keys
-- `dev-home:/home/developer` - Persistent home directory
-
-## Installed Software
-
-The container includes:
-
-- Development tools: git, vim, nano, tmux, screen
-- Languages: Python 3, Node.js, npm, Java (OpenJDK)
-- Database clients: PostgreSQL, MySQL, SQLite, Redis
-- Network tools: curl, wget, nettools, nmap
-- Build tools: build-essential, gcc, make
-
-## Troubleshooting
-
-### SSH Connection Refused
-
-- Ensure the container is running: `docker compose ps`
-- Check if port 2222 is available: `lsof -i :2222`
-
-### Permission Denied (SSH)
-
-- Run `./start.sh` to copy your SSH keys
-- Ensure your public key exists: `ls ~/.ssh/*.pub`
-
-### Git Clone Fails
-
-- The container needs your private keys for authentication
-- Ensure SSH agent forwarding or key copying is working
-- You may need to add GitHub/GitLab to known_hosts first:
-
-  ```bash
-  ssh-keyscan github.com >> ~/.ssh/known_hosts
-  ```
-
-### Multi-platform Build Error
-
-If you get "multiple platforms feature is not supported for docker driver":
-
-- Enable Docker Buildx (one-time setup):
-
-  ```bash
-  docker buildx create --use --name multiarch
-  ```
-
-- Alternatively, build for current platform only:
-
-  ```bash
-  docker build -t dockterm .
-  ```
-
-## Security Notes
-
-- The default password should be changed for production use
-- SSH keys are copied to `.docker-keys/` which is git-ignored
-- The container runs SSH on port 2222 to avoid conflicts with host SSH
+- Your code: `/home/developer/Code` (persists across rebuilds)
+- Home directory: `/home/developer` (includes tools and dotfiles)
 
 ## License
 
 MIT
-

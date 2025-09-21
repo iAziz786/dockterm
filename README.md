@@ -38,13 +38,40 @@ make flow
 
 ## What's Included
 
-**Languages:** Go 1.25.1, Rust, Python 3, Node.js, Java
-**Package Managers:** cargo, npm, pip, uv, bun, mise
-**CLI Tools:** bat, eza, ripgrep, fzf, fd, zoxide, atuin
-**Editors:** Neovim 0.11.4, vim, nano
-**Shells:** zsh with oh-my-zsh, bash
-**Database Clients:** PostgreSQL, MySQL, SQLite, Redis
-**Others:** tmux, git, docker, terraform, kubectl, aws-cli
+### Languages & Runtimes
+- **Go** 1.25.1
+- **Rust** (latest via rustup)
+- **Python** 3 with pip
+- **Node.js** with npm
+- **Java** (OpenJDK)
+
+### Modern CLI Tools
+- **bat** - Better cat with syntax highlighting
+- **eza** - Modern ls replacement
+- **ripgrep** - Blazing fast grep
+- **fzf** - Fuzzy finder
+- **fd** - User-friendly find
+- **zoxide** - Smarter cd
+- **atuin** - Shell history sync
+- **starship** - Cross-shell prompt
+- **zellij** - Terminal multiplexer
+- **nushell** - Modern shell
+
+### Development Tools
+- **Neovim** 0.11.4
+- **tmux** & **screen**
+- **git** & **stow**
+- **jq** - JSON processor
+- **vim** & **nano**
+
+### Package Managers
+- **cargo** (Rust)
+- **uv** (Python)
+- **bun** (JavaScript)
+- **mise** - Runtime version manager
+
+### Database Clients
+- PostgreSQL, MySQL, SQLite, Redis
 
 ## SSH Access
 

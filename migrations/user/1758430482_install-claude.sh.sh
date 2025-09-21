@@ -11,7 +11,7 @@ echo "Running migration: install-claude.sh"
 # Add your migration commands below
 #############################################
 
-npm install -g @anthropic-ai/claude-code
+sudo npm install -g @anthropic-ai/claude-code
 
 #############################################
 # End of migration commands

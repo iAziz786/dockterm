@@ -5,7 +5,7 @@ set -e
 # System scripts run as root, user scripts run as developer
 
 SCRIPT_DIR="/tmp/migrations"
-MIGRATION_STATE_FILE="/var/lib/dockterm/migrations.state"
+MIGRATION_STATE_FILE="$HOME/.dockterm/migrations.state"
 
 # Colors for output
 RED='\033[0;31m'
@@ -19,7 +19,7 @@ echo "      Docker Terminal Setup Migrations"
 echo -e "==========================================${NC}"
 
 # Create state directory if it doesn't exist
-mkdir -p $(dirname "$MIGRATION_STATE_FILE")
+mkdir -p "$(dirname "$MIGRATION_STATE_FILE")"
 touch "$MIGRATION_STATE_FILE"
 
 # Get current user

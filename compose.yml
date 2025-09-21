@@ -1,6 +1,6 @@
 services:
   dockterm:
-    image: ghcr.io/iaziz786/dockterm@sha256:74b1c44e6f1cdefee98d2bb7581b5a50e2783df1a947bf2a2557be582670a38a
+    image: ghcr.io/iaziz786/dockterm@sha256:70736fc37d582569d57258600e15c5a46161728e0eed0a2914acca7783ab2808
     platform: linux/amd64
     ports:
       - "2222:22"

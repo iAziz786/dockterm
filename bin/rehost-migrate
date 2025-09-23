@@ -6,6 +6,29 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 REHOST_DIR="$HOME/.local/share/rehost"
 MIGRATIONS_DIR="$REHOST_DIR/migrations"
 
+# Check for force flag or specific migration to rerun
+FORCE=false
+RERUN_MIGRATION=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --force|-f)
+            FORCE=true
+            shift
+            ;;
+        --rerun)
+            RERUN_MIGRATION="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--force] [--rerun MIGRATION_NAME]"
+            echo "  --force, -f: Run all migrations even if already completed"
+            echo "  --rerun MIGRATION_NAME: Rerun a specific migration (e.g., --rerun 1758425207_install_cli_tools.sh)"
+            exit 1
+            ;;
+    esac
+done
+
 echo "Running prechecks..."
 if ! "$PROJECT_ROOT/install/prechecks.sh"; then
     echo "Prechecks failed. Please fix the issues and try again."
@@ -19,7 +42,8 @@ run_migration() {
     local type="$2"
     local name=$(basename "$script")
 
-    if [ -f "$MIGRATIONS_DIR/$type/$name" ]; then
+    # Skip if already run, unless force flag is set or this is the specific migration to rerun
+    if [ -f "$MIGRATIONS_DIR/$type/$name" ] && [ "$FORCE" != "true" ] && [ "$name" != "$RERUN_MIGRATION" ]; then
         echo "  ⊙ Skipping: $name"
         return 0
     fi

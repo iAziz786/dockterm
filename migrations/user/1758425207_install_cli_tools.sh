@@ -105,20 +105,18 @@ else
 fi
 
 echo "Installing atuin..."
-ATUIN_VERSION=$(get_latest_release "atuinsh/atuin")
-if wget -q "https://github.com/atuinsh/atuin/releases/download/${ATUIN_VERSION}/atuin-${ATUIN_ARCH}.tar.gz"; then
-    tar xzf atuin-*.tar.gz
-    mkdir -p "$HOME/.atuin/bin"
-    mv atuin "$HOME/.atuin/bin/"
-    echo "✓ atuin installed"
-else
-    echo "⚠ atuin prebuilt not available, using installer script..."
-    if curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/atuinsh/atuin/releases/download/${ATUIN_VERSION}/atuin-installer.sh" | sh; then
-        echo "✓ atuin installed via script"
-    else
-        echo "✗ atuin installation failed"
-    fi
-fi
+mkdir -p "$HOME/.atuin/bin"
+case $ARCH_TYPE in
+    x86_64)
+        wget -q "https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-x86_64-unknown-linux-gnu.tar.gz"
+        ;;
+    aarch64)
+        wget -q "https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-aarch64-unknown-linux-gnu.tar.gz"
+        ;;
+esac
+tar xzf atuin-*.tar.gz
+mv atuin "$HOME/.atuin/bin/"
+echo "✓ atuin installed"
 
 cd /
 rm -rf "$TEMP_DIR"

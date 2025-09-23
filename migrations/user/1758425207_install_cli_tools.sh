@@ -105,17 +105,7 @@ else
 fi
 
 echo "Installing atuin..."
-mkdir -p "$HOME/.atuin/bin"
-case $ARCH_TYPE in
-    x86_64)
-        wget -q "https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-x86_64-unknown-linux-gnu.tar.gz"
-        ;;
-    aarch64)
-        wget -q "https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-aarch64-unknown-linux-gnu.tar.gz"
-        ;;
-esac
-tar xzf atuin-*.tar.gz
-mv atuin-*/atuin "$HOME/.atuin/bin/"
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-installer.sh | sh
 echo "✓ atuin installed"
 
 cd /

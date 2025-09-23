@@ -5,7 +5,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 REHOST_DIR="$HOME/.local/share/rehost"
 MIGRATIONS_DIR="$REHOST_DIR/migrations"
-STATE_FILE="$REHOST_DIR/migration.state"
 
 echo "Running prechecks..."
 if ! "$PROJECT_ROOT/install/prechecks.sh"; then
@@ -14,18 +13,13 @@ if ! "$PROJECT_ROOT/install/prechecks.sh"; then
 fi
 
 mkdir -p "$MIGRATIONS_DIR/system" "$MIGRATIONS_DIR/user"
-touch "$STATE_FILE"
-
-has_run() {
-    grep -q "^$1$" "$STATE_FILE" 2>/dev/null
-}
 
 run_migration() {
     local script="$1"
     local type="$2"
     local name=$(basename "$script")
 
-    if has_run "$type/$name"; then
+    if [ -f "$MIGRATIONS_DIR/$type/$name" ]; then
         echo "  ⊙ Skipping: $name"
         return 0
     fi
@@ -38,7 +32,6 @@ run_migration() {
         bash "$script"
     fi
 
-    echo "$type/$name" >> "$STATE_FILE"
     cp "$script" "$MIGRATIONS_DIR/$type/"
     echo "  ✓ Completed: $name"
 }

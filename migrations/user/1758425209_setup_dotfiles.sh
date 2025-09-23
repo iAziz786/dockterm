@@ -1,14 +1,13 @@
 #!/bin/bash
 
-# Script to set up dotfiles in Docker container during build
-# This runs as the developer user in the container
+# Script to set up dotfiles for the current user
 
 set -e
 
-echo "Setting up dotfiles in Docker container..."
+echo "Setting up dotfiles..."
 
-# Ensure we're in the home directory
-cd /home/developer
+# Ensure we're in the home directory of current user
+cd "$HOME"
 
 # Create necessary directories
 mkdir -p ~/.config
@@ -58,9 +57,9 @@ for package in "${PACKAGES[@]}"; do
   fi
 done
 
-# Set zsh as default shell (requires sudo)
+# Set zsh as default shell for current user
 echo "Setting zsh as default shell..."
-sudo chsh -s $(which zsh) developer
+sudo chsh -s $(which zsh) $(whoami)
 
-echo "Dotfiles setup complete in Docker container!"
+echo "Dotfiles setup complete!"
 

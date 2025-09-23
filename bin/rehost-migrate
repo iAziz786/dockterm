@@ -46,7 +46,7 @@ run_migration() {
 # Run system migrations first
 if [ -d "$PROJECT_ROOT/migrations/system" ]; then
     echo "System migrations:"
-    for script in "$PROJECT_ROOT/migrations/system"/*.sh 2>/dev/null; do
+    for script in "$PROJECT_ROOT/migrations/system"/*.sh; do
         [ -f "$script" ] || continue
         run_migration "$script" "system"
     done
@@ -55,7 +55,7 @@ fi
 # Run user migrations
 if [ -d "$PROJECT_ROOT/migrations/user" ]; then
     echo "User migrations:"
-    for script in "$PROJECT_ROOT/migrations/user"/*.sh 2>/dev/null; do
+    for script in "$PROJECT_ROOT/migrations/user"/*.sh; do
         [ -f "$script" ] || continue
         run_migration "$script" "user"
     done

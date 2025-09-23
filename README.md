@@ -5,8 +5,8 @@ Automated system setup for fresh Linux VMs with modern development tools.
 ## Quick Start
 
 ```bash
-git clone https://github.com/iAziz786/dockterm.git
-cd dockterm
+git clone https://github.com/iAziz786/rehost.git
+cd rehost
 make setup
 ```
 

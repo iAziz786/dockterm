@@ -9,10 +9,24 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 # Install NeoVim
 echo "Installing NeoVim..."
-curl -LO https://github.com/neovim/neovim-releases/releases/download/v0.11.4/nvim-linux-x86_64.tar.gz
-tar -xzf nvim-linux-x86_64.tar.gz
-sudo mv nvim-linux-x86_64 /opt/nvim
-rm nvim-linux-x86_64.tar.gz
+ARCH=$(uname -m)
+case $ARCH in
+    x86_64|amd64)
+        NVIM_ARCH="x86_64"
+        ;;
+    aarch64|arm64)
+        NVIM_ARCH="arm64"
+        ;;
+    *)
+        echo "Unsupported architecture for Neovim: $ARCH"
+        exit 1
+        ;;
+esac
+
+curl -LO "https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-${NVIM_ARCH}.tar.gz"
+tar -xzf "nvim-linux-${NVIM_ARCH}.tar.gz"
+sudo mv "nvim-linux-${NVIM_ARCH}" /opt/nvim
+rm "nvim-linux-${NVIM_ARCH}.tar.gz"
 sudo ln -s /opt/nvim/bin/nvim /usr/local/bin/nvim
 
 # Install Python package managers

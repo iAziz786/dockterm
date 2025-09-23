@@ -1,81 +1,125 @@
 #!/bin/bash
 
-# Script to install modern CLI tools from prebuilt binaries
-# This script downloads and installs: bat, eza, atuin, starship, zellij, nushell
-# Target: x86_64 Linux
-
 set -euo pipefail
 
 echo "Installing modern CLI tools from prebuilt binaries..."
 
-# Create temp directory for downloads
+ARCH=$(uname -m)
+case $ARCH in
+    x86_64|amd64)
+        ARCH_TYPE="x86_64"
+        BAT_ARCH="x86_64-unknown-linux-gnu"
+        EZA_ARCH="x86_64-unknown-linux-gnu"
+        STARSHIP_ARCH="x86_64-unknown-linux-musl"
+        ZELLIJ_ARCH="x86_64-unknown-linux-musl"
+        NU_ARCH="x86_64-unknown-linux-gnu"
+        ZOXIDE_ARCH="x86_64-unknown-linux-musl"
+        ATUIN_ARCH="x86_64-unknown-linux-gnu"
+        ;;
+    aarch64|arm64)
+        ARCH_TYPE="aarch64"
+        BAT_ARCH="aarch64-unknown-linux-gnu"
+        EZA_ARCH="aarch64-unknown-linux-gnu"
+        STARSHIP_ARCH="aarch64-unknown-linux-musl"
+        ZELLIJ_ARCH="aarch64-unknown-linux-musl"
+        NU_ARCH="aarch64-unknown-linux-musl"
+        ZOXIDE_ARCH="aarch64-unknown-linux-musl"
+        ATUIN_ARCH="aarch64-unknown-linux-gnu"
+        ;;
+    *)
+        echo "Unsupported architecture: $ARCH"
+        exit 1
+        ;;
+esac
+
+echo "Detected architecture: $ARCH_TYPE"
+
 TEMP_DIR=$(mktemp -d)
 cd "$TEMP_DIR"
 
-# Function to download latest GitHub release
 get_latest_release() {
     curl --silent "https://api.github.com/repos/$1/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
 }
 
-# Install directory (user's local bin or cargo bin)
 INSTALL_DIR="${HOME}/.cargo/bin"
 mkdir -p "$INSTALL_DIR"
 
 echo "Installing to: $INSTALL_DIR"
 
-# bat - Better cat with syntax highlighting
 echo "Installing bat..."
 BAT_VERSION=$(get_latest_release "sharkdp/bat")
-wget -q "https://github.com/sharkdp/bat/releases/download/${BAT_VERSION}/bat-${BAT_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+wget -q "https://github.com/sharkdp/bat/releases/download/${BAT_VERSION}/bat-${BAT_VERSION}-${BAT_ARCH}.tar.gz"
 tar xzf bat-*.tar.gz
 cp bat-*/bat "$INSTALL_DIR/"
 echo "✓ bat installed"
 
-# eza - Modern ls replacement
 echo "Installing eza..."
-wget -qO eza.tar.gz "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
+wget -qO eza.tar.gz "https://github.com/eza-community/eza/releases/latest/download/eza_${EZA_ARCH}.tar.gz"
 tar xzf eza.tar.gz
 mv eza "$INSTALL_DIR/"
 echo "✓ eza installed"
 
-# starship - Cross-shell prompt
 echo "Installing starship..."
-curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$INSTALL_DIR"
+STARSHIP_VERSION=$(get_latest_release "starship/starship")
+wget -q "https://github.com/starship/starship/releases/download/${STARSHIP_VERSION}/starship-${STARSHIP_ARCH}.tar.gz"
+tar xzf starship-*.tar.gz
+mv starship "$INSTALL_DIR/"
 echo "✓ starship installed"
 
-# zellij - Terminal multiplexer
 echo "Installing zellij..."
-wget -q "https://github.com/zellij-org/zellij/releases/latest/download/zellij-x86_64-unknown-linux-musl.tar.gz"
+wget -q "https://github.com/zellij-org/zellij/releases/latest/download/zellij-${ZELLIJ_ARCH}.tar.gz"
 tar xzf zellij-*.tar.gz
 chmod +x zellij
 mv zellij "$INSTALL_DIR/"
 echo "✓ zellij installed"
 
-# nushell - Modern shell
 echo "Installing nushell..."
 NU_VERSION=$(get_latest_release "nushell/nushell")
-# Remove 'v' prefix if present
 NU_VERSION_CLEAN=${NU_VERSION#v}
-wget -q "https://github.com/nushell/nushell/releases/download/${NU_VERSION}/nu-${NU_VERSION_CLEAN}-x86_64-unknown-linux-gnu.tar.gz"
-tar xzf nu-*.tar.gz
-# Nushell has binaries in a subdirectory
-cp nu-*/nu "$INSTALL_DIR/"
-echo "✓ nushell installed"
+if wget -q "https://github.com/nushell/nushell/releases/download/${NU_VERSION}/nu-${NU_VERSION_CLEAN}-${NU_ARCH}.tar.gz"; then
+    tar xzf nu-*.tar.gz
+    cp nu-*/nu "$INSTALL_DIR/"
+    echo "✓ nushell installed"
+else
+    echo "⚠ nushell ${NU_ARCH} build not available, skipping..."
+fi
 
-# zoxide - Smart directory jumper
 echo "Installing zoxide..."
-wget -q "https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.8/zoxide-0.9.8-x86_64-unknown-linux-musl.tar.gz"
-tar xzf zoxide-*.tar.gz
-chmod +x zoxide
-mv zoxide "$INSTALL_DIR/"
-echo "✓ zoxide installed"
+ZOXIDE_VERSION=$(get_latest_release "ajeetdsouza/zoxide")
+if wget -q "https://github.com/ajeetdsouza/zoxide/releases/download/${ZOXIDE_VERSION}/zoxide-${ZOXIDE_VERSION#v}-${ZOXIDE_ARCH}.tar.gz"; then
+    tar xzf zoxide-*.tar.gz
+    chmod +x zoxide
+    mv zoxide "$INSTALL_DIR/"
+    echo "✓ zoxide installed"
+else
+    echo "⚠ zoxide ${ZOXIDE_ARCH} build not available, trying alternative..."
+    if [ "$ARCH_TYPE" = "aarch64" ]; then
+        echo "Building zoxide from source via cargo..."
+        if command -v cargo >/dev/null 2>&1; then
+            cargo install zoxide
+            echo "✓ zoxide installed via cargo"
+        else
+            echo "✗ cargo not found, skipping zoxide"
+        fi
+    fi
+fi
 
-# atuin - Shell history manager
 echo "Installing atuin..."
-curl --proto '=https' --tlsv1.2 -LsSf https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-installer.sh | sh
-echo "✓ atuin installed"
+ATUIN_VERSION=$(get_latest_release "atuinsh/atuin")
+if wget -q "https://github.com/atuinsh/atuin/releases/download/${ATUIN_VERSION}/atuin-${ATUIN_ARCH}.tar.gz"; then
+    tar xzf atuin-*.tar.gz
+    mkdir -p "$HOME/.atuin/bin"
+    mv atuin "$HOME/.atuin/bin/"
+    echo "✓ atuin installed"
+else
+    echo "⚠ atuin prebuilt not available, using installer script..."
+    if curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/atuinsh/atuin/releases/download/${ATUIN_VERSION}/atuin-installer.sh" | sh; then
+        echo "✓ atuin installed via script"
+    else
+        echo "✗ atuin installation failed"
+    fi
+fi
 
-# Cleanup
 cd /
 rm -rf "$TEMP_DIR"
 
@@ -83,7 +127,6 @@ echo ""
 echo "All tools installed successfully in $INSTALL_DIR"
 echo "Make sure $INSTALL_DIR is in your PATH"
 
-# Verify installations
 echo ""
 echo "Verifying installations:"
 for tool in bat eza starship zellij nu zoxide; do
@@ -94,7 +137,6 @@ for tool in bat eza starship zellij nu zoxide; do
     fi
 done
 
-# Check atuin separately (installed in ~/.atuin/bin)
 if [ -f "$HOME/.atuin/bin/atuin" ]; then
     echo "✓ atuin found"
 else

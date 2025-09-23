@@ -1,13 +1,26 @@
 #!/bin/bash
 set -e
 
-# Go version to install
 GO_VERSION="1.25.1"
-GO_TARBALL="go${GO_VERSION}.linux-amd64.tar.gz"
+
+ARCH=$(uname -m)
+case $ARCH in
+    x86_64|amd64)
+        GO_ARCH="amd64"
+        ;;
+    aarch64|arm64)
+        GO_ARCH="arm64"
+        ;;
+    *)
+        echo "Unsupported architecture: $ARCH"
+        exit 1
+        ;;
+esac
+
+GO_TARBALL="go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
 GO_URL="https://go.dev/dl/${GO_TARBALL}"
 
-# Download Go
-echo "Downloading Go ${GO_VERSION}..."
+echo "Downloading Go ${GO_VERSION} for ${GO_ARCH}..."
 curl -L -o /tmp/${GO_TARBALL} ${GO_URL}
 
 # Remove any previous Go installation

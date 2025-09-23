@@ -1,4 +1,4 @@
-.PHONY: help build start stop restart logs shell clean migrate flow
+.PHONY: help build start stop restart shell clean migrate flow setup
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -40,6 +40,9 @@ flow: ## Start container if needed and SSH into it (usage: make flow [ARGS="--no
 
 clean: ## Clean up containers and volumes
 	docker compose down -v
+
+setup: ## Setup fresh VM with all migrations
+	@./bin/rehost-migrate
 
 migrate: ## Create a new migration script (usage: make migrate TYPE=system NAME=install_package)
 	@if [ -z "$(TYPE)" ] || [ -z "$(NAME)" ]; then \

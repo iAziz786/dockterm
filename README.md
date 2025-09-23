@@ -1,42 +1,20 @@
-# DockTerm
+# Rehost
 
-Ubuntu 24.04 development container with modern tools pre-installed.
+Automated system setup for fresh Linux VMs with modern development tools.
 
 ## Quick Start
 
 ```bash
 git clone https://github.com/iAziz786/dockterm.git
 cd dockterm
-make flow
+make setup
 ```
 
-That's it! You're now inside a fully configured development environment.
+That's it! Your development environment is ready.
 
-## Commands
+## What It Does
 
-```bash
-make flow    # Start and connect (use this most of the time)
-make stop    # Stop container
-make exec    # Connect without SSH (faster)
-make help    # Show all commands
-```
-
-## Adding Tools
-
-Need a new tool? Create a migration:
-
-```bash
-make migrate TYPE=user NAME=install_something
-```
-
-Edit the generated file in `migrations/user/`, then rebuild:
-
-```bash
-make build
-make flow
-```
-
-## What's Included
+Rehost automatically sets up a fresh Linux system with:
 
 ### Languages & Runtimes
 - **Go** 1.25.1
@@ -62,7 +40,6 @@ make flow
 - **tmux** & **screen**
 - **git** & **stow**
 - **jq** - JSON processor
-- **vim** & **nano**
 
 ### Package Managers
 - **cargo** (Rust)
@@ -73,17 +50,46 @@ make flow
 ### Database Clients
 - PostgreSQL, MySQL, SQLite, Redis
 
-## SSH Access
+## System Requirements
+
+- Debian/Ubuntu-based Linux
+- x86_64 or ARM64 architecture
+- Internet connection
+- 5GB free disk space
+
+## How It Works
+
+1. **Prechecks**: Validates system compatibility
+2. **Migrations**: Runs setup scripts in chronological order
+3. **State Tracking**: Skips already-completed steps
+
+Setup files are stored in `~/.local/share/rehost/`
+
+## Adding Custom Tools
+
+Create a new migration:
 
 ```bash
-ssh -p 2222 developer@localhost
-# Password: devpassword
+make migrate TYPE=user NAME=install_tool
 ```
 
-## Volumes
+Edit the generated file in `migrations/user/`, then run:
 
-- Your code: `/home/developer/Code` (persists across rebuilds)
-- Home directory: `/home/developer` (includes tools and dotfiles)
+```bash
+make setup
+```
+
+Only new migrations will run.
+
+## For Root vs User
+
+```bash
+# User-level tools (dotfiles, development tools)
+make setup
+
+# System-level packages (requires root)
+sudo make setup
+```
 
 ## License
 

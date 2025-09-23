@@ -115,7 +115,7 @@ case $ARCH_TYPE in
         ;;
 esac
 tar xzf atuin-*.tar.gz
-mv atuin "$HOME/.atuin/bin/"
+mv atuin-*/atuin "$HOME/.atuin/bin/"
 echo "✓ atuin installed"
 
 cd /
